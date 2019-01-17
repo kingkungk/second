@@ -1,5 +1,6 @@
 package com.kingkung.train;
 
+import com.kingkung.lib.MyClass;
 import com.kingkung.train.api.TrainApiService;
 import com.kingkung.train.bean.PassengerInfo;
 import com.kingkung.train.bean.TrainDetails;
@@ -89,6 +90,10 @@ public class TrainPage extends BasePage<TrainPresenter> implements TrainContract
         }
 
         presenter.interval(0, refreshLoginInterval, () -> presenter.uamtk());
+
+        if (MyClass.isTestSendEmail) {
+            presenter.sendEmail(sendEmails, "测试标题", "测试内容");
+        }
     }
 
     @Override

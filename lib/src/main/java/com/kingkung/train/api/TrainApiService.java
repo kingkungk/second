@@ -1,5 +1,6 @@
 package com.kingkung.train.api;
 
+import com.kingkung.lib.MyClass;
 import com.kingkung.train.utils.FileUtil;
 import com.kingkung.train.utils.Log;
 import com.kingkung.train.utils.TextUtils;
@@ -44,8 +45,11 @@ public class TrainApiService {
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .retryOnConnectionFailure(true)
                 .addInterceptor(logging)
-                .cookieJar(new MyCookieJar())
-                .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 1080)));
+                .cookieJar(new MyCookieJar());
+
+        if (MyClass.isProxy) {
+            builder.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 1080)));
+        }
 
         try {
             SSLContext sslContext = SSLContext.getInstance("SSL");
