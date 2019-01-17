@@ -16,14 +16,24 @@ public class Log {
 
     private static Logger logger;
 
+    private static Date curLogDate;
+
+    private final static long rollingTime = 1000 * 60 * 60 * 2;
+
+    private final static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm", Locale.ENGLISH);
+
     public Log() {
+        logger = Logger.getLogger("train");
+        logger.setLevel(Level.ALL);
+        removeParentHandler(logger);
+        initHandler();
+    }
+
+    public static void initHandler() {
         try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm", Locale.ENGLISH);
-            logger = Logger.getLogger("train");
-            removeParentHandler(logger);
-            logger.setLevel(Level.ALL);
+            curLogDate = new Date();
             FileHandler fileHandler = new FileHandler(FileUtil.logDir.getAbsolutePath() +
-                    File.separator + format.format(new Date()) + ".log");
+                    File.separator + format.format(curLogDate) + ".log");
             fileHandler.setLevel(Level.ALL);
             fileHandler.setFormatter(new LogFormatter());
             logger.addHandler(fileHandler);
@@ -55,10 +65,20 @@ public class Log {
 
     public static void print(String message) {
         initLog();
+        checkTime();
         logger.info(message);
     }
 
-    class LogFormatter extends Formatter {
+    private static void checkTime() {
+        Date date = new Date();
+        if ((date.getTime() - curLogDate.getTime()) > rollingTime) {
+            synchronized (Log.class) {
+                initHandler();
+            }
+        }
+    }
+
+    static class LogFormatter extends Formatter {
         @Override
         public String format(LogRecord record) {
             return "[" + new Date().toString() + "]" + "[" + record.getLevel() + "]" + record.getClass() + record.getMessage() + "\n";

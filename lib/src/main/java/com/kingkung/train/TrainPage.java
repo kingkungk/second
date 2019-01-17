@@ -23,7 +23,7 @@ public class TrainPage extends BasePage<TrainPresenter> implements TrainContract
     public static SimpleDateFormat timerDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     //刷新间隔
-    private int refreshQueryInterval = 1000;
+    private int refreshQueryInterval = 750;
     //刷新登录会话
     private int refreshLoginInterval = 1000 * 60 * 5;
     //出发站
@@ -35,7 +35,7 @@ public class TrainPage extends BasePage<TrainPresenter> implements TrainContract
     private List<String> trainNo = Arrays.asList("K", "G", "D", "Z");
     //    private List<String> trainNo = Arrays.asList("K");
     //乘车日期
-    private List<String> trainDate = Arrays.asList("2019-01-31", "2019-01-31", "2019-02-01", "2019-02-02");
+    private List<String> trainDate = Arrays.asList("2019-01-30", "2019-01-31", "2019-02-01", "2019-02-02");
     //乘车人姓名
     private List<String> passengerNames = Arrays.asList("程航");
     //选择车次的起始时间
@@ -108,10 +108,10 @@ public class TrainPage extends BasePage<TrainPresenter> implements TrainContract
     public void uamauthClientSuccess(String username) {
         System.out.println("验证成功，用户名：" + username);
         if (!isStartQuery) {
-            isStartQuery = false;
             return;
         }
         try {
+            isStartQuery = false;
             long timer;
             long timerTime = timerDateFormat.parse(timerDate).getTime();
             long curTime = System.currentTimeMillis();
