@@ -1,0 +1,34 @@
+apply plugin: 'java'
+
+jar {
+    manifest {
+        attributes "Implementation-Title": project.name
+        attributes "Implementation-Version": '1.0.0'
+        attributes "Main-Class": "com.kingkung.lib.MyClass"
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    into('assets') {
+        from 'assets'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile 'io.reactivex.rxjava2:rxjava:2.2.3'
+
+    compile 'com.squareup.retrofit2:retrofit:2.5.0'
+    compile 'com.squareup.retrofit2:converter-scalars:2.5.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.5.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
+
+    compile 'com.squareup.okhttp3:okhttp:3.12.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.12.0'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+sourceCompatibility = "8"
+targetCompatibility = "8"
