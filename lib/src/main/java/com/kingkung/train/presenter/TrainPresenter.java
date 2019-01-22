@@ -59,8 +59,20 @@ public class TrainPresenter extends BasePresenter<TrainContract.View> implements
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private SimpleDateFormat serverDateFormat = new SimpleDateFormat("yyyyMMdd");
 
+    private List<Disposable> intervalDisposables = new ArrayList<>();
+
     public TrainPresenter(TrainApi api) {
         this.api = api;
+    }
+
+    public void setTrainApi(TrainApi api) {
+        this.api = api;
+    }
+
+    public void intervalDispose() {
+        for (Disposable disposable : intervalDisposables) {
+            disposable.dispose();
+        }
     }
 
     @Override
@@ -73,6 +85,7 @@ public class TrainPresenter extends BasePresenter<TrainContract.View> implements
                     }
                 });
         addSubscription(disposable);
+        intervalDisposables.add(disposable);
     }
 
     @Override
@@ -418,6 +431,8 @@ public class TrainPresenter extends BasePresenter<TrainContract.View> implements
                         boolean submitStatus = Boolean.parseBoolean(data.submitStatus);
                         if (submitStatus) {
                             mView.confirmSingleForQueueSuccess(detail);
+                        } else {
+                            mView.confirmSingleForQueueFaild();
                         }
                     }
                 });

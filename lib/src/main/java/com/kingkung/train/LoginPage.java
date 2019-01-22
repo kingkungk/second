@@ -1,6 +1,7 @@
 package com.kingkung.train;
 
 
+import com.kingkung.lib.MyClass;
 import com.kingkung.train.api.TrainApiService;
 import com.kingkung.train.contract.LoginContract;
 import com.kingkung.train.presenter.LoginPresenter;
@@ -26,7 +27,7 @@ public class LoginPage extends BasePage<LoginPresenter> implements LoginContract
 
     @Override
     protected void inject() {
-        presenter = new LoginPresenter(TrainApiService.getTrainApi());
+        presenter = new LoginPresenter(TrainApiService.getTrainApi(MyClass.isProxy));
     }
 
     @Override

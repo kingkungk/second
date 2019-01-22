@@ -29,6 +29,8 @@ public interface TrainContract {
 
         void confirmSingleForQueueSuccess(TrainDetails detail);
 
+        void confirmSingleForQueueFaild();
+
         void queryOrderWaitTimeSuccess(TrainDetails detail);
 
         void resultOrderForQueueSuccess();

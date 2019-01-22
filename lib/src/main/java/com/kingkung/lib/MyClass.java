@@ -6,6 +6,8 @@ public class MyClass {
     public static boolean isProxy = false;
     public static boolean isTestSendEmail = false;
 
+    public static boolean isSubmitFromProxy = true;
+
     public static void main(String[] args) {
         initArg(args);
 

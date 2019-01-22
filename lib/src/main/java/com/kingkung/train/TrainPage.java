@@ -31,10 +31,8 @@ public class TrainPage extends BasePage<TrainPresenter> implements TrainContract
     private String fromStation = "杭州";
     //到达站
     private String toStation = "蕲春";
-    //    private String toStation = "义乌";
     // 车次，如果为空就不过滤
     private List<String> trainNo = Arrays.asList("K", "G", "D", "Z");
-    //    private List<String> trainNo = Arrays.asList("K");
     //乘车日期
     private List<String> trainDate = Arrays.asList("2019-01-30", "2019-01-31", "2019-02-01", "2019-02-02");
     //乘车人姓名
@@ -77,7 +75,7 @@ public class TrainPage extends BasePage<TrainPresenter> implements TrainContract
 
     @Override
     protected void inject() {
-        presenter = new TrainPresenter(TrainApiService.getTrainApi());
+        presenter = new TrainPresenter(TrainApiService.getTrainApi(MyClass.isProxy));
     }
 
     @Override
@@ -92,7 +90,7 @@ public class TrainPage extends BasePage<TrainPresenter> implements TrainContract
         presenter.interval(0, refreshLoginInterval, () -> presenter.uamtk());
 
         if (MyClass.isTestSendEmail) {
-            presenter.sendEmail(sendEmails, "测试标题", "测试内容");
+            presenter.sendEmail(sendEmails, "java端", "测试内容");
         }
     }
 
@@ -163,7 +161,13 @@ public class TrainPage extends BasePage<TrainPresenter> implements TrainContract
             showMsg("");
             return;
         }
-        presenter.sendEmail(sendEmails, "这是标题1", "查询到可买的票");
+
+        presenter.intervalDispose();
+        if (MyClass.isSubmitFromProxy) {
+            presenter.setTrainApi(TrainApiService.getTrainApi(true));
+        }
+
+        presenter.sendEmail(sendEmails, "java端", "查询到可买的票");
         for (TrainDetails detail : result) {
             showMsg("车次:" + detail.trainNo + "\t\t可买票类型:" +
                     detail.seatTypes.toString() + "\t\t张数:" + detail.count);
@@ -217,8 +221,17 @@ public class TrainPage extends BasePage<TrainPresenter> implements TrainContract
 
     @Override
     public void confirmSingleForQueueSuccess(TrainDetails detail) {
-        presenter.sendEmail(sendEmails, "这是标题2", "订单排队中");
+        presenter.sendEmail(sendEmails, "java端", "订单排队中");
         presenter.queryOrderWaitTime(detail);
+    }
+
+    @Override
+    public void confirmSingleForQueueFaild() {
+        presenter.sendEmail(sendEmails, "java端", "提交失败");
+        if (MyClass.isSubmitFromProxy) {
+            presenter.setTrainApi(TrainApiService.getTrainApi(false));
+        }
+        presenter.interval(0, refreshLoginInterval, () -> presenter.uamtk());
     }
 
     @Override
@@ -228,7 +241,7 @@ public class TrainPage extends BasePage<TrainPresenter> implements TrainContract
 
     @Override
     public void resultOrderForQueueSuccess() {
-        presenter.sendEmail(sendEmails, "这是标题3", "订单提交成功");
+        presenter.sendEmail(sendEmails, "java端", "订单提交成功");
         presenter.detachView();
     }
 

@@ -1,6 +1,5 @@
 package com.kingkung.train.api;
 
-import com.kingkung.lib.MyClass;
 import com.kingkung.train.utils.FileUtil;
 import com.kingkung.train.utils.Log;
 import com.kingkung.train.utils.TextUtils;
@@ -35,11 +34,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class TrainApiService {
-    private static TrainApi service;
+    private static TrainApi trainApi;
 
-    private final Map<String, List<Cookie>> cookieStore = new HashMap<>();
+    private static TrainApi proxyTrainApi;
 
-    public TrainApiService() {
+    private static final Map<String, List<Cookie>> cookieStore = new HashMap<>();
+
+    public TrainApiService(boolean isProxy) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(Log::print);
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
@@ -47,7 +48,7 @@ public class TrainApiService {
                 .addInterceptor(logging)
                 .cookieJar(new MyCookieJar());
 
-        if (MyClass.isProxy) {
+        if (isProxy) {
             builder.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 1080)));
         }
 
@@ -68,14 +69,25 @@ public class TrainApiService {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(client)
                 .build();
-        service = retrofit.create(TrainApi.class);
+        if (isProxy) {
+            proxyTrainApi = retrofit.create(TrainApi.class);
+        } else {
+            trainApi = retrofit.create(TrainApi.class);
+        }
     }
 
-    public synchronized static TrainApi getTrainApi() {
-        if (service == null) {
-            new TrainApiService();
+    public synchronized static TrainApi getTrainApi(boolean isProxy) {
+        if (isProxy) {
+            if (proxyTrainApi == null) {
+                new TrainApiService(isProxy);
+            }
+            return proxyTrainApi;
+        } else {
+            if (trainApi == null) {
+                new TrainApiService(isProxy);
+            }
+            return trainApi;
         }
-        return service;
     }
 
     public class MyCookieJar implements CookieJar {
